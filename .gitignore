@@ -1,3 +1,9 @@
+# IAR EWARM intermediate folders and files. by hwpark
+settings
+ewarm
+*.dep
+Debug
+
 # Object files
 *.o
 *.ko
