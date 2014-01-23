@@ -1,7 +1,7 @@
 
 /*
  * ex01_MCO
- * MCO1 pin(PA8)을 통해 system master clock / 2 (84MHz)을 출력.
+ * MCO1 pin(PA8)을 통해 system master clock / 2 (90MHz)을 출력.
  */
 
 #include "stm32f4xx.h"
