@@ -12,11 +12,11 @@
 #include "switch.h"
 #include "motor.h"
 
-#define COUNTER_PER_SEC             1000        // systick timer frequency. 1kHz -> 1ms interval tick
+#define COUNTER_PER_SEC             10000        // systick timer frequency. 10kHz -> 0.1ms interval tick
 
 
-#define STEP_RESOLUTION_MS          1           // 스텝 모터 구동 클럭 해상도
-#define SCAN_INTERVAL_MS            5           // 조이스틱 스캔 시간 간격
+#define STEP_RESOLUTION_TICK          1           // 스텝 모터 구동 클럭 해상도
+#define SCAN_INTERVAL_TICK            50          // 조이스틱 스캔 시간 간격
 
 
 
@@ -44,7 +44,7 @@ enum
 
 static int x_cmd, y_cmd, z_cmd;
 static int x_cmd_prev, y_cmd_prev, z_cmd_prev;
-static int step_interval_ms[CMD_MAX] = {9999, 4, 2, 1};
+static int step_interval_ms[CMD_MAX] = {9999, 30, 12, 6};
 static int x_cnt, y_cnt, z_cnt;
 
 
@@ -88,6 +88,10 @@ int main()
 
     while(1)
     {
+
+        __WFI();
+
+
         if (flag_step)
         {
             flag_step = 0;
@@ -110,13 +114,13 @@ void SysTick_Handler(void)
 {
     unsigned long tick = g_tick++;
 
-    if (tick % STEP_RESOLUTION_MS == 0)
+    if (tick % STEP_RESOLUTION_TICK == 0)
     {
         flag_step = 1;
     }
 
 
-    if (tick % SCAN_INTERVAL_MS == 0)
+    if (tick % SCAN_INTERVAL_TICK == 0)
     {
         flag_scan = 1;
     }
