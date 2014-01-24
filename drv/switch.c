@@ -5,17 +5,17 @@
 
 
 static uint32_t SW_RCC[NO_KEY] = {
-    RCC_AHB1Periph_GPIOE, 
-    RCC_AHB1Periph_GPIOE, 
     RCC_AHB1Periph_GPIOE,
-    RCC_AHB1Periph_GPIOE, 
-    RCC_AHB1Periph_GPIOE, 
-    RCC_AHB1Periph_GPIOD, 
-    RCC_AHB1Periph_GPIOG, 
-    RCC_AHB1Periph_GPIOG, 
-    RCC_AHB1Periph_GPIOF, 
-    RCC_AHB1Periph_GPIOB, 
-    RCC_AHB1Periph_GPIOB, 
+    RCC_AHB1Periph_GPIOE,
+    RCC_AHB1Periph_GPIOE,
+    RCC_AHB1Periph_GPIOE,
+    RCC_AHB1Periph_GPIOE,
+    RCC_AHB1Periph_GPIOD,
+    RCC_AHB1Periph_GPIOG,
+    RCC_AHB1Periph_GPIOG,
+    RCC_AHB1Periph_GPIOF,
+    RCC_AHB1Periph_GPIOB,
+    RCC_AHB1Periph_GPIOB,
     RCC_AHB1Periph_GPIOD,
     RCC_AHB1Periph_GPIOD,
     RCC_AHB1Periph_GPIOD,
@@ -64,25 +64,28 @@ void Init_SW(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
     uint8_t i;
-    
+
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-    
+
     for(i=0; i<NO_KEY; i++) {
         RCC_AHB1PeriphClockCmd(SW_RCC[i], ENABLE);
-        
+
         GPIO_InitStructure.GPIO_Pin = SW_Pin[i];
         GPIO_Init(GPIO[i], &GPIO_InitStructure);
     }
 }
 
 
+// 현재 키 상태를 반환한다.
+// 키가 눌려지거나 조이스틱 입력 들어오면 0을 리턴한다.
+// 아닌 경우에는 1을 리턴한다.
 uint8_t Read_SW(uint8_t ch)
 {
     if (ch < NO_KEY) {
         return GPIO_ReadInputDataBit(GPIO[ch], SW_Pin[ch]);
     }
-    
+
     // Active High
     return 1;
 }
