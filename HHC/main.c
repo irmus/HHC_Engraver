@@ -10,7 +10,7 @@
 #include "util.h"
 //#include "led.h"
 #include "switch.h"
-
+#include "motor.h"
 
 #define COUNTER_PER_SEC             1000        // systick timer frequency. 1kHz -> 1ms interval tick
 
@@ -43,14 +43,10 @@ enum
 
 
 static int x_cmd, y_cmd, z_cmd;
-static int step_interval_ms[CMD_MAX] = {9999, 1, 2, 4};
+static int x_cmd_prev, y_cmd_prev, z_cmd_prev;
+static int step_interval_ms[CMD_MAX] = {9999, 4, 2, 1};
 static int x_cnt, y_cnt, z_cnt;
 
-enum
-{
-    DIR_CW,
-    DIR_CCW,
-};
 
 static int x_dir, y_dir, z_dir;
 
@@ -58,9 +54,8 @@ static int x_dir, y_dir, z_dir;
 
 enum
 {
-    KEYSTAT_UNKNOWN,
-    KEYSTAT_DOWN,
     KEYSTAT_UP,
+    KEYSTAT_DOWN,
 };
 
 
@@ -81,6 +76,8 @@ int main()
 //    Init_LED();
 
     Init_SW();
+
+    Motor_Init();
 
 
     if (SysTick_Config(SystemCoreClock / COUNTER_PER_SEC))
@@ -137,18 +134,20 @@ static void ScanJoystick(void)
     // 순차적으로 모든 키를 스캔해서 상태를 읽어온다.
     for (i = KEY_LEFT; i < NO_KEY; i++)
     {
-        current = Read_SW(i)
+        current = Read_SW(i);
 
         // debouncing을 위해 바로 직전 값과 비교해서 동일한 경우만 인정한다.
-        if (joystick_status == KEYSTAT_UNKNOWN && current == joystick_previous[i])
+        if (current == joystick_previous[i])
         {
             if (current)
-                joystick_status[i] = KEYSTAT_DOWN;
-            else
                 joystick_status[i] = KEYSTAT_UP;
+            else
+                joystick_status[i] = KEYSTAT_DOWN;
         }
         else
-            joystick_status[i] = KEYSTAT_UNKNOWN;
+        {
+            joystick_status[i] = KEYSTAT_UP;
+        }
 
         joystick_previous[i] = current;
     }
@@ -179,9 +178,9 @@ static void ScanJoystick(void)
 
         // 방향 설정
         if (joystick_status[KEY_LEFT] == KEYSTAT_DOWN)
-            x_dir = DIR_CCW;
-        else
             x_dir = DIR_CW;
+        else
+            x_dir = DIR_CCW;
     }
 
 
@@ -247,19 +246,69 @@ static void ScanJoystick(void)
 // 현재 설정된 cmd에 따라 모터 구동 펄스를 생성한다.
 static void DriveMotor(void)
 {
+    if (x_cmd != x_cmd_prev)
+        x_cnt = step_interval_ms[x_cmd];        // reload counter value
+    x_cmd_prev = x_cmd;
+
     if (x_cmd == CMD_STOP)
     {
         x_cnt = step_interval_ms[CMD_STOP];
     }
     else
     {
-        if (--x_cnt == 0)       // timeout
+        if (--x_cnt <= 0)       // timeout
         {
             x_cnt = step_interval_ms[x_cmd];        // reload counter value
 
-            // TODO: X축 direction 설정
+            Motor_SetDirection(MOTOR_X, x_dir);
 
-            // TODO: X축 클럭 반전
+            Motor_ToggleClock(MOTOR_X);
+        }
+    }
+
+
+
+
+    if (y_cmd != y_cmd_prev)
+        y_cnt = step_interval_ms[y_cmd];        // reload counter value
+    y_cmd_prev = y_cmd;
+
+    if (y_cmd == CMD_STOP)
+    {
+        y_cnt = step_interval_ms[CMD_STOP];
+    }
+    else
+    {
+        if (--y_cnt <= 0)       // timeout
+        {
+            y_cnt = step_interval_ms[y_cmd];        // reload counter value
+
+            Motor_SetDirection(MOTOR_Y, y_dir);
+
+            Motor_ToggleClock(MOTOR_Y);
+        }
+    }
+
+
+
+
+    if (z_cmd != z_cmd_prev)
+        z_cnt = step_interval_ms[z_cmd];        // reload counter value
+    z_cmd_prev = z_cmd;
+
+    if (z_cmd == CMD_STOP)
+    {
+        z_cnt = step_interval_ms[CMD_STOP];
+    }
+    else
+    {
+        if (--z_cnt <= 0)       // timeout
+        {
+            z_cnt = step_interval_ms[z_cmd];        // reload counter value
+
+            Motor_SetDirection(MOTOR_Z, z_dir);
+
+            Motor_ToggleClock(MOTOR_Z);
         }
     }
 

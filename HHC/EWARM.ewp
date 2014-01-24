@@ -231,7 +231,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>1111111</state>
+          <state>0000000</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -320,7 +320,7 @@
         </option>
         <option>
           <name>CCOptLevel</name>
-          <state>3</state>
+          <state>0</state>
         </option>
         <option>
           <name>CCOptStrategy</name>
@@ -329,7 +329,7 @@
         </option>
         <option>
           <name>CCOptLevelSlave</name>
-          <state>3</state>
+          <state>0</state>
         </option>
         <option>
           <name>CompilerMisraRules98</name>
@@ -1875,7 +1875,13 @@
       <name>$PROJ_DIR$\..\drv\assert.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\drv\motor.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\drv\startup_stm32f429_439xx.s</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\drv\switch.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\drv\system_stm32f4xx.c</name>
